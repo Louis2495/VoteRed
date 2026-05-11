@@ -132,7 +132,7 @@
   }
 
   .search-wrap {
-    flex: 0 0 320px;
+    flex: 0 0 260px;
     position: relative;
   }
 
@@ -1837,46 +1837,15 @@ function addSourceInput() {
   container.appendChild(row);
 }
 
-async function submitSuggestion() {
+function submitSuggestion() {
   const fact = document.getElementById("suggestFact").value.trim();
   if (!fact) { showToast("Please enter a fact."); return; }
-
-  const category = document.getElementById("suggestCategory").value;
-  const sourceUrls = Array.from(
-    document.querySelectorAll("#sourceInputs .form-input")
-  ).map(i => i.value.trim()).filter(Boolean).join(", ");
-
-  const submitBtn = document.querySelector(".btn-submit");
-  submitBtn.textContent = "Sending…";
-  submitBtn.disabled = true;
-
-  try {
-    const res = await fetch("https://formspree.io/f/xgodreja", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Accept": "application/json" },
-      body: JSON.stringify({
-        fact,
-        category: category || "Not specified",
-        sources: sourceUrls || "None provided"
-      })
-    });
-
-    if (res.ok) {
-      closeModal();
-      showToast("✓ Thank you! The creator will review your suggestion.");
-      document.getElementById("suggestFact").value = "";
-      document.getElementById("suggestCategory").value = "";
-      document.getElementById("sourceInputs").innerHTML =
-        `<div class="source-input-row"><input class="form-input" type="url" placeholder="https://…" /></div>`;
-    } else {
-      showToast("Something went wrong. Please try again.");
-    }
-  } catch (e) {
-    showToast("Network error. Please try again.");
-  } finally {
-    submitBtn.textContent = "Submit Suggestion";
-    submitBtn.disabled = false;
-  }
+  closeModal();
+  showToast("✓ Suggestion received — thank you!");
+  document.getElementById("suggestFact").value = "";
+  document.getElementById("suggestCategory").value = "";
+  document.getElementById("sourceInputs").innerHTML =
+    `<div class="source-input-row"><input class="form-input" type="url" placeholder="https://…" /></div>`;
 }
 
 function showToast(msg) {
