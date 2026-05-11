@@ -1,0 +1,1941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vote Red — The Record</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,400&family=Oswald:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #C0392B;
+    --red-dark: #96281B;
+    --red-bright: #E74C3C;
+    --red-pale: #FDECEA;
+    --navy: #1A3A5C;
+    --navy-dark: #0F2338;
+    --navy-mid: #1E4976;
+    --gold: #D4A017;
+    --gold-light: #F0C940;
+    --bg: #F2F0ED;
+    --bg-card: #FFFFFF;
+    --text-dark: #1a1a1a;
+    --text-mid: #3a3a3a;
+    --text-light: #777;
+    --border: rgba(0,0,0,0.09);
+    --shadow: 0 2px 12px rgba(0,0,0,0.07);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Source Serif 4', Georgia, serif;
+    background: var(--bg);
+    color: var(--text-dark);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ========== HERO ========== */
+  .hero {
+    position: relative;
+    background: var(--red);
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: 60px 20px 50px;
+  }
+
+  /* Subtle flag stripes */
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      180deg,
+      rgba(255,255,255,0.07) 0px, rgba(255,255,255,0.07) 36px,
+      transparent 36px, transparent 72px
+    );
+  }
+
+  /* Dark navy canton area */
+  .hero::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 300px; height: 180px;
+    background: var(--navy-dark);
+    opacity: 0.5;
+  }
+
+  .stars-canvas {
+    position: absolute;
+    top: 0; left: 0;
+    width: 300px; height: 180px;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+  }
+
+  .hero-eyebrow {
+    font-family: 'Oswald', sans-serif;
+    font-size: 12px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    margin-bottom: 14px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease forwards 0.2s;
+  }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(48px, 8vw, 88px);
+    font-weight: 900;
+    color: #fff;
+    line-height: 0.92;
+    letter-spacing: -2px;
+    text-shadow: 0 3px 20px rgba(0,0,0,0.35);
+    opacity: 0;
+    animation: fadeUp 0.7s ease forwards 0.35s;
+  }
+
+  .hero-title em {
+    font-style: normal;
+    color: var(--gold-light);
+  }
+
+  .hero-subtitle {
+    font-family: 'Source Serif 4', serif;
+    font-size: 16px;
+    color: rgba(255,255,255,0.78);
+    margin-top: 14px;
+    font-style: italic;
+    font-weight: 300;
+    letter-spacing: 0.2px;
+    opacity: 0;
+    animation: fadeUp 0.7s ease forwards 0.55s;
+  }
+
+  .hero-rule {
+    width: 64px;
+    height: 3px;
+    background: var(--gold-light);
+    margin: 18px auto 0;
+    opacity: 0;
+    animation: fadeUp 0.7s ease forwards 0.7s;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ========== STICKY NAV BAR ========== */
+  .controls-bar {
+    background: var(--navy-dark);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 3px 18px rgba(0,0,0,0.3);
+  }
+
+  .search-wrap {
+    flex: 1;
+    min-width: 200px;
+    position: relative;
+  }
+
+  .search-wrap svg {
+    position: absolute;
+    left: 11px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255,255,255,0.35);
+    pointer-events: none;
+  }
+
+  #search {
+    width: 100%;
+    padding: 9px 12px 9px 36px;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 4px;
+    background: rgba(255,255,255,0.09);
+    color: white;
+    font-family: 'Source Serif 4', serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  #search::placeholder { color: rgba(255,255,255,0.35); }
+  #search:focus { border-color: var(--gold-light); background: rgba(255,255,255,0.14); }
+
+  .filter-pills {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .pill {
+    font-family: 'Oswald', sans-serif;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    border-radius: 3px;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: transparent;
+    color: rgba(255,255,255,0.65);
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .pill:hover { border-color: var(--gold-light); color: var(--gold-light); }
+  .pill.active { background: var(--red); border-color: var(--red-bright); color: white; }
+
+  .fact-count {
+    font-family: 'Oswald', sans-serif;
+    font-size: 12px;
+    color: rgba(255,255,255,0.4);
+    letter-spacing: 1px;
+    margin-left: auto;
+    white-space: nowrap;
+  }
+
+  .suggest-btn {
+    font-family: 'Oswald', sans-serif;
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 9px 20px;
+    background: var(--gold);
+    color: var(--navy-dark);
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.15s, transform 0.1s;
+    white-space: nowrap;
+  }
+  .suggest-btn:hover { background: var(--gold-light); transform: translateY(-1px); }
+  .suggest-btn:active { transform: translateY(0); }
+
+  /* ========== LAYOUT ========== */
+  .page-layout {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 36px 24px 80px;
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 32px;
+    align-items: start;
+  }
+
+  /* ========== SIDEBAR ========== */
+  .sidebar {
+    position: sticky;
+    top: 72px;
+  }
+
+  .sidebar-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+  }
+
+  .sidebar-heading {
+    font-family: 'Oswald', sans-serif;
+    font-size: 10px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: white;
+    background: var(--navy);
+    padding: 10px 16px;
+  }
+
+  .sidebar-nav button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 10px 16px;
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--border);
+    font-family: 'Source Serif 4', serif;
+    font-size: 13px;
+    color: var(--text-mid);
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s, color 0.15s;
+    gap: 6px;
+  }
+  .sidebar-nav button:last-child { border-bottom: none; }
+  .sidebar-nav button:hover { background: var(--red-pale); color: var(--red); }
+  .sidebar-nav button.active { background: var(--red-pale); color: var(--red); font-weight: 600; }
+  .sidebar-nav button .cat-count {
+    font-family: 'Oswald', sans-serif;
+    font-size: 11px;
+    color: var(--text-light);
+    background: rgba(0,0,0,0.06);
+    padding: 2px 7px;
+    border-radius: 10px;
+    flex-shrink: 0;
+  }
+  .sidebar-nav button.active .cat-count { background: rgba(192,57,43,0.15); color: var(--red); }
+
+  .sidebar-stats {
+    padding: 16px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .stat-box {
+    text-align: center;
+    padding: 10px 8px;
+    background: var(--bg);
+    border-radius: 4px;
+  }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--red);
+    display: block;
+  }
+  .stat-label {
+    font-family: 'Oswald', sans-serif;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    display: block;
+    margin-top: 2px;
+  }
+
+  /* ========== MAIN CONTENT ========== */
+  .main-content {}
+
+  .category-section {
+    margin-bottom: 48px;
+  }
+
+  .category-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--red);
+  }
+
+  .category-icon {
+    width: 34px;
+    height: 34px;
+    background: var(--red);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 15px;
+  }
+
+  .category-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 23px;
+    font-weight: 700;
+    color: var(--navy);
+    flex: 1;
+  }
+
+  .category-count {
+    font-family: 'Oswald', sans-serif;
+    font-size: 11px;
+    color: var(--text-light);
+    letter-spacing: 1px;
+    background: rgba(0,0,0,0.06);
+    padding: 3px 10px;
+    border-radius: 12px;
+  }
+
+  /* ========== FACT CARDS ========== */
+  .facts-grid {
+    display: grid;
+    gap: 12px;
+  }
+
+  .fact-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--red);
+    border-radius: 5px;
+    padding: 18px 20px 14px;
+    transition: box-shadow 0.2s, border-left-color 0.2s;
+    position: relative;
+  }
+
+  .fact-card:hover {
+    box-shadow: 0 4px 20px rgba(0,0,0,0.09);
+    border-left-color: var(--navy);
+  }
+
+  .fact-text {
+    font-size: 15px;
+    line-height: 1.68;
+    color: var(--text-dark);
+    font-weight: 400;
+    margin-bottom: 12px;
+  }
+
+  .sources {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .source-label {
+    font-family: 'Oswald', sans-serif;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-light);
+  }
+
+  .source-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.3px;
+    color: var(--navy);
+    text-decoration: none;
+    background: rgba(26,58,92,0.07);
+    padding: 3px 9px;
+    border-radius: 2px;
+    border: 1px solid rgba(26,58,92,0.15);
+    transition: all 0.14s;
+    max-width: 260px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .source-link:hover { background: var(--navy); color: white; border-color: var(--navy); }
+
+  .source-cite {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 11px;
+    color: var(--text-light);
+    background: rgba(0,0,0,0.04);
+    padding: 3px 9px;
+    border-radius: 2px;
+    border: 1px dashed rgba(0,0,0,0.18);
+    font-style: italic;
+  }
+
+  /* ========== MODAL ========== */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.22s;
+    backdrop-filter: blur(3px);
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+  .modal {
+    background: #fff;
+    border-radius: 7px;
+    max-width: 540px;
+    width: 100%;
+    overflow: hidden;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.35);
+    transform: translateY(16px) scale(0.97);
+    transition: transform 0.22s ease;
+    border-top: 5px solid var(--red);
+  }
+  .modal-overlay.open .modal { transform: translateY(0) scale(1); }
+
+  .modal-header {
+    background: var(--navy-dark);
+    padding: 20px 26px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .modal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    color: white;
+  }
+
+  .modal-close {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.55);
+    font-size: 22px;
+    cursor: pointer;
+    padding: 0 4px;
+    line-height: 1;
+    transition: color 0.12s;
+  }
+  .modal-close:hover { color: white; }
+
+  .modal-body { padding: 24px 26px; }
+
+  .modal-note {
+    font-size: 14px;
+    color: var(--text-mid);
+    margin-bottom: 22px;
+    line-height: 1.6;
+    font-style: italic;
+    border-left: 3px solid var(--gold);
+    padding-left: 13px;
+  }
+
+  .form-group { margin-bottom: 18px; }
+
+  .form-label {
+    display: block;
+    font-family: 'Oswald', sans-serif;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--navy);
+    margin-bottom: 7px;
+  }
+
+  .form-input, .form-textarea {
+    width: 100%;
+    padding: 10px 13px;
+    border: 1px solid rgba(0,0,0,0.16);
+    border-radius: 4px;
+    font-family: 'Source Serif 4', serif;
+    font-size: 14px;
+    color: var(--text-dark);
+    background: #fafafa;
+    outline: none;
+    transition: border-color 0.18s, box-shadow 0.18s;
+  }
+  .form-input:focus, .form-textarea:focus {
+    border-color: var(--navy);
+    box-shadow: 0 0 0 3px rgba(26,58,92,0.09);
+    background: white;
+  }
+  .form-textarea { resize: vertical; min-height: 96px; }
+
+  .sources-add-area {
+    border: 1px dashed rgba(0,0,0,0.18);
+    border-radius: 4px;
+    padding: 13px;
+    background: rgba(0,0,0,0.02);
+  }
+
+  .source-input-row {
+    display: flex;
+    gap: 7px;
+    margin-bottom: 7px;
+    align-items: center;
+  }
+  .source-input-row .form-input { margin: 0; flex: 1; }
+
+  .remove-source {
+    background: none;
+    border: 1px solid rgba(192,57,43,0.3);
+    color: var(--red);
+    width: 28px; height: 28px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 17px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.13s;
+  }
+  .remove-source:hover { background: var(--red); color: white; }
+
+  .add-source-btn {
+    font-family: 'Oswald', sans-serif;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--navy);
+    background: none;
+    border: 1px solid rgba(26,58,92,0.25);
+    padding: 6px 13px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.13s;
+    margin-top: 3px;
+  }
+  .add-source-btn:hover { background: var(--navy); color: white; }
+
+  .modal-footer {
+    padding: 0 26px 24px;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+  }
+
+  .btn-cancel {
+    font-family: 'Oswald', sans-serif;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 10px 18px;
+    border: 1px solid rgba(0,0,0,0.18);
+    background: none;
+    border-radius: 3px;
+    cursor: pointer;
+    color: var(--text-mid);
+    transition: all 0.13s;
+  }
+  .btn-cancel:hover { border-color: var(--text-dark); color: var(--text-dark); }
+
+  .btn-submit {
+    font-family: 'Oswald', sans-serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 10px 26px;
+    background: var(--red);
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background 0.13s;
+  }
+  .btn-submit:hover { background: var(--red-dark); }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    background: var(--navy-dark);
+    color: white;
+    padding: 13px 20px;
+    border-radius: 4px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 12px;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+    border-left: 4px solid var(--gold);
+    opacity: 0;
+    transform: translateY(8px);
+    transition: all 0.28s;
+    z-index: 2000;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  /* No results */
+  .no-results {
+    text-align: center;
+    padding: 60px 20px;
+    display: none;
+  }
+  .no-results.visible { display: block; }
+  .no-results h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    color: var(--navy);
+    margin-bottom: 8px;
+  }
+  .no-results p { color: var(--text-light); font-style: italic; }
+
+  /* Footer */
+  footer {
+    background: var(--navy-dark);
+    color: rgba(255,255,255,0.35);
+    text-align: center;
+    padding: 22px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  footer span { color: var(--gold); }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--red); border-radius: 3px; }
+
+  @media (max-width: 800px) {
+    .page-layout {
+      grid-template-columns: 1fr;
+    }
+    .sidebar {
+      position: static;
+    }
+    .sidebar-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 12px;
+    }
+    .sidebar-nav button {
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 7px 11px;
+      font-size: 12px;
+      width: auto;
+    }
+    .sidebar-stats { display: none; }
+  }
+
+  @media (max-width: 540px) {
+    .controls-bar { gap: 8px; }
+    .fact-count { display: none; }
+    .hero { min-height: 220px; padding: 48px 16px 36px; }
+    .modal-body, .modal-footer { padding-left: 16px; padding-right: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<header class="hero">
+  <canvas class="stars-canvas" id="starsCanvas"></canvas>
+  <div class="hero-content">
+    <div class="hero-eyebrow">★ The Record ★</div>
+    <div class="hero-title">Vote <em>Red</em></div>
+    <div class="hero-subtitle">A documented repository of facts with cited sources</div>
+    <div class="hero-rule"></div>
+  </div>
+</header>
+
+<!-- CONTROLS BAR -->
+<div class="controls-bar">
+  <div class="search-wrap">
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+    <input id="search" type="text" placeholder="Search facts…" oninput="filterFacts()">
+  </div>
+  <div class="fact-count" id="factCount"></div>
+  <button class="suggest-btn" onclick="openModal()">★ Suggest a Fact</button>
+</div>
+
+<!-- PAGE LAYOUT: SIDEBAR + MAIN -->
+<div class="page-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-heading">Browse by Category</div>
+      <nav class="sidebar-nav" id="sidebarNav">
+        <button class="active" data-cat="all" onclick="setCategory('all', this)">
+          All Facts <span class="cat-count" id="cnt-all">—</span>
+        </button>
+        <button data-cat="Criminal Activity &amp; Fraud" onclick="setCategory('Criminal Activity &amp; Fraud', this)">
+          ⚖️ Fraud &amp; Crime <span class="cat-count" id="cnt-crime">—</span>
+        </button>
+        <button data-cat="Anti-American &amp; Anti-Republican" onclick="setCategory('Anti-American &amp; Anti-Republican', this)">
+          🇺🇸 Anti-American <span class="cat-count" id="cnt-antiam">—</span>
+        </button>
+        <button data-cat="Democrats Support the Bad People" onclick="setCategory('Democrats Support the Bad People', this)">
+          🚨 Bad People <span class="cat-count" id="cnt-bad">—</span>
+        </button>
+        <button data-cat="Lack of Competence &amp; Intelligence" onclick="setCategory('Lack of Competence &amp; Intelligence', this)">
+          🤦 Incompetence <span class="cat-count" id="cnt-incomp">—</span>
+        </button>
+        <button data-cat="Consequences of Democrats in Power" onclick="setCategory('Consequences of Democrats in Power', this)">
+          📉 Consequences <span class="cat-count" id="cnt-conseq">—</span>
+        </button>
+        <button data-cat="The Mainstream Media" onclick="setCategory('The Mainstream Media', this)">
+          📺 Media <span class="cat-count" id="cnt-media">—</span>
+        </button>
+        <button data-cat="Hypocrisy &amp; Lies" onclick="setCategory('Hypocrisy &amp; Lies', this)">
+          🎭 Hypocrisy <span class="cat-count" id="cnt-hypo">—</span>
+        </button>
+        <button data-cat="Racism" onclick="setCategory('Racism', this)">
+          ✊ Racism <span class="cat-count" id="cnt-racism">—</span>
+        </button>
+        <button data-cat="People" onclick="setCategory('People', this)">
+          👤 People <span class="cat-count" id="cnt-people">—</span>
+        </button>
+        <button data-cat="Other" onclick="setCategory('Other', this)">
+          📌 Other <span class="cat-count" id="cnt-other">—</span>
+        </button>
+      </nav>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-heading">Stats</div>
+      <div class="sidebar-stats">
+        <div class="stat-box">
+          <span class="stat-num" id="statTotal">—</span>
+          <span class="stat-label">Total Facts</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-num" id="statSourced">—</span>
+          <span class="stat-label">Sourced</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-num" id="statCats">10</span>
+          <span class="stat-label">Categories</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-num" id="statShowing">—</span>
+          <span class="stat-label">Showing</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN FACTS AREA -->
+  <main id="mainContent">
+    <div class="no-results" id="noResults">
+      <h3>No facts found</h3>
+      <p>Try a different search or category filter.</p>
+    </div>
+  </main>
+
+</div><!-- end page-layout -->
+
+<!-- SUGGEST MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Suggest a Fact</div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-note">
+        Have a documented fact that belongs in this archive? Submit it below and it will be reviewed before publication.
+      </div>
+      <div class="form-group">
+        <label class="form-label">The Fact</label>
+        <textarea class="form-textarea" id="suggestFact" placeholder="State the fact clearly and concisely…"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Source URL(s)</label>
+        <div class="sources-add-area">
+          <div id="sourceInputs">
+            <div class="source-input-row">
+              <input class="form-input" type="url" placeholder="https://…" />
+            </div>
+          </div>
+          <button class="add-source-btn" onclick="addSourceInput()">+ Add Another Source</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select class="form-input" id="suggestCategory">
+          <option value="">— Select a category —</option>
+          <option>Criminal Activity &amp; Fraud</option>
+          <option>Anti-American &amp; Anti-Republican</option>
+          <option>Democrats Support the Bad People</option>
+          <option>Lack of Competence &amp; Intelligence</option>
+          <option>Consequences of Democrats in Power</option>
+          <option>The Mainstream Media</option>
+          <option>Hypocrisy &amp; Lies</option>
+          <option>Racism</option>
+          <option>People</option>
+          <option>Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-submit" onclick="submitSuggestion()">Submit Suggestion</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<footer>
+  <span>Vote Red</span> — The Record &nbsp;·&nbsp; A documented archive of political facts
+</footer>
+
+<script>
+// ========== DATA ==========
+const FACTS = [
+  // ─── CRIMINAL ACTIVITY & FRAUD ───
+  {
+    cat: "Criminal Activity & Fraud",
+    text: "FBI uncovers FOUR illegal counterintelligence operations targeting Trump and his associates for ten years. DNI Director Tulsi Gabbard: \"There is irrefutable evidence…\" — The White House.",
+    sources: [
+      { label: "Just the News", url: "https://justthenews.com/government/congress/biden-fbis-wiretap-susie-wiles-call-lawyer-bigger-watergate-senate-testimony" },
+      { label: "White House", url: "https://www.whitehouse.gov" }
+    ]
+  },
+  {
+    cat: "Criminal Activity & Fraud",
+    text: "Operation Gold Rush: 324 Defendants Charged for $14,600,000,000 in Healthcare Fraud.",
+    sources: [{ label: "DOJ", url: "https://www.justice.gov/opa/pr/national-health-care-fraud-takedown-results-324-defendants-charged-connection-over-146" }]
+  },
+  {
+    cat: "Criminal Activity & Fraud",
+    text: "Over $100,000,000,000 in taxpayer money was extorted and funneled to left-wing corporations to build bridges to nowhere during the last 76 days of the Biden–Harris administration, while the same program allocated only $40 million over the previous 15 years.",
+    sources: [{ label: "Source", url: "https://x.com/MyNewsLikes/status/2035821519763349616" }]
+  },
+  {
+    cat: "Criminal Activity & Fraud",
+    text: "California lost $32.6 billion of taxpayer money to fraudulent unemployment insurance applications. At one point, there were more applicants than residents over the age of 18.",
+    sources: [{ label: "City Journal", url: "https://www.city-journal.org/article/gavin-newsom-california-fraud" }]
+  },
+  {
+    cat: "Criminal Activity & Fraud",
+    text: "Obama officials charged with narco trafficking and laundering $12,000,000 for the Jalisco New Generation Cartel.",
+    sources: [{ label: "DOJ", url: "https://www.justice.gov/usao-sdny/pr/former-senior-dea-official-indicted-conspiring-provide-material-support-foreign" }]
+  },
+  {
+    cat: "Criminal Activity & Fraud",
+    text: "Monica Cannon-Grant pleaded guilty to fraud — stealing pandemic relief funds — and was ordered to repay more than $224,000.",
+    sources: [{ label: "DOJ", url: "https://www.justice.gov/usao-ma/pr/former-bostonian-year-sentenced-fraud" }]
+  },
+  {
+    cat: "Criminal Activity & Fraud",
+    text: "Democrats support counting illegal immigrants for congressional reapportionment.",
+    sources: [{ label: "Maryland Matters", url: "https://marylandmatters.org/2020/07/30/dems-blast-trump-effort-to-exclude-undocumented-immigrants-from-census-counts/" }]
+  },
+  {
+    cat: "Criminal Activity & Fraud",
+    text: "The Joe Biden autopen scandal: documents signed by automated pen without the President's knowledge or involvement.",
+    sources: [{ label: "House Oversight", url: "https://oversight.house.gov/landing/the-biden-autopen-presidency/" }]
+  },
+  {
+    cat: "Criminal Activity & Fraud",
+    text: "20 California hotels caught up in a birthright citizenship fraud scheme (birth tourism).",
+    sources: [{ label: "NBC News", url: "https://www.nbcnews.com/news/us-news/feds-raid-l-maternity-hotel-birth-tourists-n315996" }]
+  },
+  {
+    cat: "Criminal Activity & Fraud",
+    text: "Obama administration shipping literal cash to Iran terrorists as long as they promised not to build nuclear weapons.",
+    sources: [{ label: "Hudson Institute", url: "https://www.hudson.org/national-security-defense/seven-myths-about-the-iran-nuclear-deal" }]
+  },
+  {
+    cat: "Criminal Activity & Fraud",
+    text: "NY AG Letitia James hit with two more criminal referrals alleging possible homeowner insurance fraud.",
+    sources: [{ label: "NY Post", url: "https://nypost.com/2026/03/25/us-news/ny-ag-letitia-james-hit-with-two-more-criminal-referrals-alleging-possible-insurance-fraud/" }]
+  },
+  {
+    cat: "Criminal Activity & Fraud",
+    text: "Rod Blagojevich convicted in 2011 on corruption charges, including attempting to 'sell' Barack Obama's vacant Senate seat.",
+    sources: [{ label: "The Guardian", url: "https://www.theguardian.com/world/2011/jun/27/rod-blagojevich-illinois-corruption-guilty" }]
+  },
+  {
+    cat: "Criminal Activity & Fraud",
+    text: "BLM Oklahoma City leader indicted for $3,150,000 embezzlement, wire fraud, and money laundering.",
+    sources: [{ label: "Oklahoma Voice", url: "https://oklahomavoice.com/2025/12/12/oklahoma-city-black-lives-matter-leader-indicted-on-embezzlement-money-laundering-charges/" }]
+  },
+  {
+    cat: "Criminal Activity & Fraud",
+    text: "Congressman Chaka Fattah sentenced to 10 years in prison for participating in a racketeering conspiracy.",
+    sources: [{ label: "DOJ", url: "https://www.justice.gov/archives/opa/pr/former-congressman-chaka-fattah-sentenced-10-years-prison-participating-racketeering" }]
+  },
+  {
+    cat: "Criminal Activity & Fraud",
+    text: "Former U.S. Congresswoman Corrine Brown (D-FL) convicted for stealing tens of thousands of dollars in a fraud scheme.",
+    sources: [{ label: "DOJ", url: "https://www.justice.gov/archives/opa/pr/former-us-congresswoman-corrine-brown-and-two-others-sentenced-prison-fraud-scheme-involving" }]
+  },
+  {
+    cat: "Criminal Activity & Fraud",
+    text: "Pennsylvania Democratic commissioner arrested on over 100 felony drug charges for orchestrating cocaine transactions.",
+    sources: [{ label: "Just the News", url: "https://justthenews.com/government/local/pa-democratic-commissioner-arrested-more-100-felony-drug-charges" }]
+  },
+  {
+    cat: "Criminal Activity & Fraud",
+    text: "Ilhan Omar immigration fraud — allegations that she married her own brother to game the immigration system.",
+    sources: [{ label: "Fox News", url: "https://www.foxnews.com/video/6392095304112" }]
+  },
+  {
+    cat: "Criminal Activity & Fraud",
+    text: "Ilhan Omar facilitated and committed money laundering and other fraud. (Investigations ongoing.)",
+    sources: [{ label: "CITE", url: "" }]
+  },
+  {
+    cat: "Criminal Activity & Fraud",
+    text: "Obama's spy chiefs rigged the 2017 Intelligence Community Assessment to falsely claim Russia helped Trump win, using garbage intel and the Clinton-funded Steele dossier over career analysts' objections.",
+    sources: [{ label: "Imprimis / Hillsdale", url: "https://imprimis.hillsdale.edu/the-significance-of-the-recently-released-russia-hoax-documents/" }]
+  },
+  {
+    cat: "Criminal Activity & Fraud",
+    text: "AOC ethics complaint for breaking the law: $19,000 in campaign funds paid to her ketamine doctor for personal use.",
+    sources: [{ label: "NY Post", url: "https://nypost.com/2026/03/28/us-news/aoc-violated-laws-by-spending-19000-in-campaign-cash-on-ketamine-therapy-shrink-for-personal-use-complaint/" }]
+  },
+  {
+    cat: "Criminal Activity & Fraud",
+    text: "A Democrat judge in Wisconsin helped an illegal alien escape out the back of her courtroom to evade ICE.",
+    sources: [{ label: "The Guardian", url: "https://www.theguardian.com/us-news/2025/dec/19/wisconsin-judge-immigrant-ice-found-guilty" }]
+  },
+  {
+    cat: "Criminal Activity & Fraud",
+    text: "Sandy Berger (Clinton's National Security Advisor) stole from the National Archives and destroyed multiple copies of the 'Millennium After-Action Review,' which detailed the Clinton administration's handling of terror threats.",
+    sources: [{ label: "Cato Institute", url: "https://www.cato.org/blog/sandy-berger-oops-i-must-have-accidentally-stuck-wrong-papers-briefcase-hidden-them-under" }]
+  },
+
+  // ─── ANTI-AMERICAN & ANTI-REPUBLICAN ───
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "Hassan Piker (#5 ranked Twitch streamer) said America deserved the 9/11 attacks.",
+    sources: [{ label: "Rep. Ritchie Torres", url: "https://ritchietorres.house.gov/congressman-ritchie-torres-writes-to-executives-at-twitch-and-amazon-hasan-piker-is-dangerous" }]
+  },
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "Democrat Internet censorship of conservatives — documented suppression of conservative voices online.",
+    sources: [{ label: "Buddy Carter", url: "https://buddycarter.house.gov/news/email/show.aspx?ID=Z5XYJLJCVZMH3SKW22OSRDQE7Y%20" }]
+  },
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "Democrats admitted their DHS shutdown is 'making people hurt' while stalling negotiations with dangerous demands.",
+    sources: [{ label: "White House", url: "https://www.whitehouse.gov/releases/2026/03/democrats-admit-their-dhs-shutdown-is-making-people-hurt-as-they-stall-negotiations-with-dangerous-demands/" }]
+  },
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "Democrats weaponized the DOJ to label parents protesting at PTA meetings as terrorist threats.",
+    sources: [{ label: "House Judiciary", url: "https://judiciary.house.gov/media/press-releases/us-house-judiciary-republicans-doj-labeled-dozens-of-parents-as-terrorist" }]
+  },
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "Democrat officials about Trump supporters: 'They should be hanged by the neck until dead.'",
+    sources: [{ label: "Senator Bellino", url: "https://senatorjosephbellino.com" }]
+  },
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "Democrat activists attacked a church — children cried as protesters prevented parents from reaching them and screamed that their parents were Nazis.",
+    sources: [{ label: "Medium", url: "https://medium.com/@richbitterman/minnesota-church-riot-more-disturbing-than-first-reported-c67bc75a7541" }]
+  },
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "'No-Kings' protester wrote 'Kill your local ICE officer' on an LA federal building.",
+    sources: [{ label: "Post Millennial", url: "https://thepostmillennial.com/no-kings-agitator-writes-kill-your-local-ice-agent-on-federal-building-in-los-angeles" }]
+  },
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "Terrorist sympathizers in Philadelphia cheered for American soldiers being killed.",
+    sources: [{ label: "Gateway Pundit", url: "https://www.thegatewaypundit.com/2026/03/abhorrent-terrorist-sympathizers-philadelphia-celebrate-fallen-u-s/" }]
+  },
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "Diamond Wallace, 31, murdered Christine Jones for being a Trump supporter.",
+    sources: [{ label: "Fox News", url: "https://www.foxnews.com/us/trump-supporter-allegedly-killed-by-ex-coworker-who-expressed-animosity-over-political-beliefs-complaint" }]
+  },
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "Man paraded a pig's head in a cop's hat on a stake during protests in Minnesota.",
+    sources: [{ label: "NY Post", url: "https://nypost.com/2021/04/15/man-holds-pigs-head-in-a-cops-hat-on-stake-at-daunte-wright-protest/" }]
+  },
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "'Keep NYC Trash Free' posters featured crossed-out images of people wearing MAGA hats.",
+    sources: [{ label: "Reuters", url: "https://www.reuters.com/fact-check/artists-anti-maga-trash-free-nyc-posters-date-2018-2024-11-08/" }]
+  },
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "Democrat politicians who publicly supported the 'ACAB' (All Cops Are Bastards) and/or 'Defund the Police' movements include: Ilhan Omar, Ayanna Pressley, Kirsten Gillibrand, Bernie Sanders, Rashida Tlaib, Jamaal Bowman, Maxine Waters, Mondaire Jones, Cori Bush, Alexandria Ocasio-Cortez, Mark Pocan, Mazie Hirono, Pramila Jayapal, Katie Porter, Barbara Lee, Nydia Velazquez, Zoe Lofgren, David Cicilline, Earl Blumenauer, and Yvette Clarke.",
+    sources: [{ label: "RSC / Pfluger", url: "https://rsc-pfluger.house.gov/democrats-push-defund-police" }]
+  },
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "Maxine Waters (D-CA): 'If you see anybody from [President Trump's cabinet] in a restaurant, in a department store, at a gasoline station, you get out and you create a crowd and you push back on them!'",
+    sources: [{ label: "Congress.gov", url: "https://www.congress.gov/bill/117th-congress/house-resolution/327" }]
+  },
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "Maxine Waters: 'I threaten Trump supporters all the time.'",
+    sources: [{ label: "Source", url: "https://www.youtube.com" }]
+  },
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "Hillary Clinton: 'You cannot be civil with a political party that wants to destroy what you stand for.'",
+    sources: [{ label: "CNN Politics", url: "https://www.cnn.com/2018/10/09/politics/hillary-clinton-civility-congress/index.html" }]
+  },
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "Kathy Griffin posted a photo of a decapitated Trump head, leading to her termination by CNN.",
+    sources: [{ label: "Source", url: "https://www.youtube.com" }]
+  },
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "Rep. Hakeem Jeffries falsely claimed ICE would brutalize or kill people at airports.",
+    sources: [{ label: "CNN / Facebook", url: "https://www.facebook.com/cnn/videos/democratic-minority-leader-rep-hakeem-jeffries-sharply-criticized-the-trump-admi/4893404577552647/" }]
+  },
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "A FEMA worker told hurricane responders to skip homes displaying pro-Trump signs.",
+    sources: [{ label: "NPR", url: "https://www.npr.org/2024/11/09/g-s1-33601/fema-worker-hurricane-trump-signs-florida" }]
+  },
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "Senator Richard Blumenthal (D-CT) falsely claimed ICE agents would shoot and kill families when deployed to airports.",
+    sources: [{ label: "Gateway Pundit", url: "https://www.thegatewaypundit.com/2026/03/democrat-senator-richard-da-nang-dick-blumenthal-says/" }]
+  },
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "Former CNN anchor Jim Acosta praised a protester's sign wishing Trump dead.",
+    sources: [{ label: "Gateway Pundit", url: "https://www.thegatewaypundit.com/2026/03/watch-disgraced-former-cnn-hack-jim-acosta-laughs/" }]
+  },
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "Ilhan Omar called Stephen Miller a copycat of the Nazis.",
+    sources: [{ label: "YouTube", url: "https://www.youtube.com/watch?v=cA9A82u0o2I" }]
+  },
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "Tim Walz called for insurrection, stating that Minnesota is 'at war with the federal government.'",
+    sources: [{ label: "Fox News", url: "https://www.foxnews.com/opinion/mike-davis-what-happening-minnesota-why-we-have-insurrection-act" }]
+  },
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "148 House Democrats voted against a bill to deport illegal immigrants who assault police officers.",
+    sources: [{ label: "KOMO News", url: "https://komonews.com/news/nation-world/148-house-dems-vote-against-deporting-illegal-migrants-who-attack-police-officers-the-detain-and-deport-illegal-aliens-who-assault-cops-act-immigration-southern-border-crisis" }]
+  },
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "Senator Duckworth announced she will vote no on all remaining Trump nominees, regardless of their qualifications.",
+    sources: [{ label: "Source", url: "https://www.youtube.com" }]
+  },
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "Hassan Piker: 'If you cared about Medicare fraud or Medicaid fraud, you would kill Rick Scott.'",
+    sources: [{ label: "CITE", url: "" }]
+  },
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "Hassan Piker: 'Kill them. Kill those motherfuckers. And murder those motherfuckers in the street. Let the streets soak in their fucking red capitalist blood.'",
+    sources: [{ label: "YouTube", url: "https://www.youtube.com/watch?v=dm44N_HEZMY" }]
+  },
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "Abigail Spanberger said it is 'horrifying' that under President Trump, crossing the border illegally is 'considered a criminal act.'",
+    sources: [{ label: "Townhall", url: "https://townhall.com/tipsheet/amy-curtis/2025/10/17/spanberger-horrifying-that-its-a-criminal-act-to-enter-the-country-illegally-n2665129" }]
+  },
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "Democrat NY-04 candidate Kiana Bierria-Anderson called for the abolishment of the 13th Amendment — the amendment that abolished slavery.",
+    sources: [{ label: "X / Conservative War Machine", url: "https://x.com" }]
+  },
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "Gavin Newsom posted an edited photo of Nick Shirley to demonize him after Shirley uncovered over $170,000,000 in California hospice and daycare fraud.",
+    sources: [{ label: "X / Gov Press Office", url: "https://x.com/GovPressOffice/status/2033738730654339584" }]
+  },
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "Democrats at the SOTU refused to stand in agreement with the statement, 'The first duty of the American government is to protect American citizens, not illegal aliens.'",
+    sources: [{ label: "YouTube", url: "https://www.youtube.com/watch?v=P9QCE6HPZYQ" }]
+  },
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "Texas state legislator James Talarico called God 'nonbinary.'",
+    sources: [{ label: "Facebook / Pete Sessions", url: "https://www.facebook.com" }]
+  },
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "Socialist NYC mayoral candidate Zohran Mamdani once rapped about his 'love' for Hamas terror-funding group 'Holy Land Five.'",
+    sources: [{ label: "CITE", url: "" }]
+  },
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "Senator Chris Murphy (D-CT) admitted Democrats care more about undocumented immigrants than American citizens.",
+    sources: [{ label: "Fox News", url: "https://www.foxnews.com/politics/senators-resurfaced-comment-on-who-democrats-care-about-the-most-sparks-online-outrage-he-really-said-it" }]
+  },
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "Democrats betrayed female athletes by burying a commonsense girls' sports protection bill despite bipartisan support.",
+    sources: [{ label: "NY Senate", url: "https://www.nysenate.gov" }]
+  },
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "Hassan Piker, speaking at Yale University: 'Empires never die quietly, but we must end the American empire regardless.'",
+    sources: [{ label: "CITE", url: "" }]
+  },
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "Hassan Piker, speaking at Yale University: 'The fall of the USSR was one of the greatest catastrophes of the 20th century.'",
+    sources: [{ label: "CITE", url: "" }]
+  },
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "Democrat Texas House challenger Bobby Pulido starred in a bizarre music video where he played a pervert.",
+    sources: [{ label: "NY Post", url: "https://nypost.com/2026/03/17/us-news/dem-challenger-in-texas-house-race-starred-in-his-own-bizarre-music-video-where-he-played-a-pervert/" }]
+  },
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "Maine Senate candidate Graham Platner publicly called Jesus a 'zombie' and the Virgin Mary a 'skank' on social media.",
+    sources: [{ label: "Bangor Daily News", url: "https://www.bangordailynews.com/2026/04/03/politics/elections/maine-graham-platner-reddit-jesus-zombie-mary-skank-jokes/" }]
+  },
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "Minnesota Lieutenant Governor Peggy Flanagan was photographed wearing a shirt that read 'Protect Trans Kids' with a graphic of a knife.",
+    sources: [{ label: "Facebook / Sean Hannity", url: "https://www.facebook.com/SeanHannity/videos/minnesota-lt-gov-peggy-flanagan-wearing-a-shirt-with-a-knife-that-reads-protect-/759004463729110/" }]
+  },
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "Tim Walz mandated tampons in boys' restrooms in Minnesota schools.",
+    sources: [{ label: "NPR", url: "https://www.npr.org/2024/08/07/nx-s1-5066878/tim-walz-tampon-law-minnesota" }]
+  },
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "Kamala Harris said 18–24 year olds are stupid, at the Ford Foundation (May 8, 2014).",
+    sources: [{ label: "YouTube", url: "https://www.youtube.com/shorts/bPCK2w51NCs" }]
+  },
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "Hassan Piker: 'Old enough to count, old enough to mount.' (On the subject of child sexual abuse.)",
+    sources: [{ label: "YouTube", url: "https://www.youtube.com/watch?v=vSDxuo-gpIk" }]
+  },
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "A new book claims Shakespeare was a Black Jewish woman.",
+    sources: [{ label: "NY Post", url: "https://nypost.com/2026/01/28/media/new-book-claims-shakespeare-was-a-black-jewish-woman-poet/" }]
+  },
+  {
+    cat: "Anti-American & Anti-Republican",
+    text: "California Democrat Rene Campos attempted to become the first registered sex offender elected to a city council.",
+    sources: [{ label: "ABC30", url: "https://abc30.com/post/are-not-past-registered-sex-offender-seeks-join-race-fresno-city-council-district-7/18647775/" }]
+  },
+
+  // ─── DEMOCRATS SUPPORT THE BAD PEOPLE ───
+  {
+    cat: "Democrats Support the Bad People",
+    text: "A transgender illegal immigrant received only 6 months in prison for raping a 14-year-old.",
+    sources: [{ label: "National Pulse", url: "https://thenationalpulse.com/2026/03/26/transgender-illegal-immigrant-receives-just-six-months-in-prison-for-sexually-assaulting-schoolboy/" }]
+  },
+  {
+    cat: "Democrats Support the Bad People",
+    text: "Democrats refused to stand to honor Iryna Zarutska's mother at the State of the Union address.",
+    sources: [{ label: "YouTube", url: "https://www.youtube.com/watch?v=tKyvFsd8d2A" }]
+  },
+  {
+    cat: "Democrats Support the Bad People",
+    text: "A 27-year-old Guatemalan illegal immigrant was charged with the violent rape of a 5-year-old girl so severe she required surgery.",
+    sources: [{ label: "National Pulse", url: "https://thenationalpulse.com/2026/03/26/illegal-immigrant-charged-with-violent-rape-of-5-year-old/" }]
+  },
+  {
+    cat: "Democrats Support the Bad People",
+    text: "Four-time-deported Honduran criminal illegal alien Bairon Hernandez — with 15 prior charges — killed 83-year-old veteran and a bystander by shoving them onto NYC subway tracks.",
+    sources: [{ label: "DHS", url: "https://www.dhs.gov/news/2026/03/12/four-time-deported-criminal-illegal-alien-15-prior-charges-arrested-after-shoving" }]
+  },
+  {
+    cat: "Democrats Support the Bad People",
+    text: "Governor Pritzker blamed Trump for the murder of Sheridan Gorman — who was killed by an illegal alien let into the US by Biden and released instead of deported after being caught shoplifting. A Venezuelan illegal migrant accused of the killing had entered the country under Biden.",
+    sources: [
+      { label: "DHS", url: "https://www.dhs.gov/news/2026/03/22/ice-asks-governor-pritzker-and-chicago-sanctuary-politicians-not-release-criminal" },
+      { label: "NY Post", url: "https://nypost.com/2026/03/22/us-news/venezuelan-illegal-migrant-accused-of-killing-loyola-student-sheridan-gorman-entered-country-under-biden-dhs-confirms/" }
+    ]
+  },
+  {
+    cat: "Democrats Support the Bad People",
+    text: "Democrat Chicago Alderwoman said a Loyola student shot by an illegal alien was in the 'wrong place, wrong time' and may have startled the shooter — effectively blaming the victim.",
+    sources: [{ label: "Gateway Pundit", url: "https://www.thegatewaypundit.com/2026/03/victim-blaming-democrat-chicago-alderwoman-says-loyola-student/" }]
+  },
+  {
+    cat: "Democrats Support the Bad People",
+    text: "Efforts were made to release a 19-year-old illegal immigrant who raped 13-year-old girls in high school hallways; more victims came forward.",
+    sources: [{ label: "National Pulse", url: "https://thenationalpulse.com/2026/03/26/more-victims-of-migrant-accused-of-high-school-sexual-assault-spree-come-forward/" }]
+  },
+  {
+    cat: "Democrats Support the Bad People",
+    text: "All Democrats voted against a bill to deport illegal alien fraudsters who steal taxpayer welfare benefits.",
+    sources: [{ label: "Seattle Red", url: "https://seattlered.com/immigration/deporting-fraudsters-act-house-vote-democrats-welfare-fraud/4117498" }]
+  },
+  {
+    cat: "Democrats Support the Bad People",
+    text: "U.S. mosques held memorials for Ayatollah Khomeini — who said a man can marry a girl younger than nine and who murdered over 36,500 protesters. Democrats support these mosques.",
+    sources: [
+      { label: "CITE", url: "" },
+      { label: "Wikipedia / 2026 Iran Massacres", url: "https://en.wikipedia.org/wiki/2026_Iran_massacres" }
+    ]
+  },
+  {
+    cat: "Democrats Support the Bad People",
+    text: "BLM riots burned cities, destroyed businesses, and enabled mass looting from stores across the country.",
+    sources: [{ label: "YouTube", url: "https://www.youtube.com/watch?v=3B79fn6Fmj0" }]
+  },
+  {
+    cat: "Democrats Support the Bad People",
+    text: "Karine Jean-Pierre (Biden's White House Press Secretary) said the trans community is 'under attack' — immediately after a trans person shot up a Christian school and killed six children.",
+    sources: [{ label: "Fox News", url: "https://www.foxnews.com/video/6323727222112" }]
+  },
+  {
+    cat: "Democrats Support the Bad People",
+    text: "BLM leader caught on video fighting and beating a female staffer who had accused him of gambling away organization funds.",
+    sources: [{ label: "NY Post", url: "https://nypost.com/2026/03/04/us-news/wild-video-shows-blm-leader-fighting-female-staffer-who-accused-him-of-gambling-funds/" }]
+  },
+  {
+    cat: "Democrats Support the Bad People",
+    text: "Widespread leftist support for Luigi Mangione — the murderer of UnitedHealthcare CEO Brian Thompson — including calling him a 'hero and a martyr.' CNN promoted his GoFundMe defense page.",
+    sources: [{ label: "CNN", url: "https://www.cnn.com/2025/04/26/us/luigi-mangione-supporters" }]
+  },
+  {
+    cat: "Democrats Support the Bad People",
+    text: "Senator Chris Van Hollen (D-MD) stated that he believes Iran over the President of the United States.",
+    sources: [{ label: "AOL News", url: "https://www.aol.com/news/watch-sen-chris-van-hollen-015227886.html" }]
+  },
+  {
+    cat: "Democrats Support the Bad People",
+    text: "Democrat candidate Jay Jones wrote that a political opponent and his children should die, including that the children 'die in their mother's arms.' ABC, CBS, and PBS gave the story zero seconds of coverage. Democrats did not call for his withdrawal.",
+    sources: [{ label: "Virginia Mercury", url: "https://virginiamercury.com/2025/10/05/beyond-disqualifying-jay-jones-controversy-jolts-virginias-pivotal-2025-elections/" }]
+  },
+  {
+    cat: "Democrats Support the Bad People",
+    text: "An Indian illegal alien was indicted after leading police on a 100 MPH chase that caused a fatal head-on collision, killing a pregnant 17-year-old and her unborn child in Ohio.",
+    sources: [{ label: "DHS", url: "https://www.dhs.gov/news/2026/04/04/indian-illegal-alien-indicted-after-leading-police-100-mph-chase-causing-fatal-head" }]
+  },
+  {
+    cat: "Democrats Support the Bad People",
+    text: "Alexander Devante Dickey broke into 22-year-old Logan Federico's home and fatally shot her — even after accumulating 48 criminal charges (31 felonies) across 14 prior occasions.",
+    sources: [{ label: "SC Daily Gazette", url: "https://scdailygazette.com/2025/10/02/father-of-slain-22-year-old-wants-federal-prosecutors-to-handle-daughters-murder-case/" }]
+  },
+  {
+    cat: "Democrats Support the Bad People",
+    text: "Criminal illegal alien Juan Alvarado-Aguilar killed a 19- and 20-year-old couple in a DWI crash in North Carolina.",
+    sources: [{ label: "DHS", url: "https://www.dhs.gov/news/2026/01/23/ice-lodges-detainer-criminal-illegal-alien-accused-killing-19-and-20-year-old" }]
+  },
+  {
+    cat: "Democrats Support the Bad People",
+    text: "Bernard Lane — ringleader of a massive theft ring that stole $300,000 from Target, with 70 prior arrests, 36 convictions, and a history of violence — was released on $1 bond.",
+    sources: [{ label: "ABC13", url: "https://abc13.com/post/houston-based-crime-ring-stole-300k-target-stores-texas-department-public-safety-says/17976230/" }]
+  },
+  {
+    cat: "Democrats Support the Bad People",
+    text: "Trans people danced at the University of New Mexico chanting 'I Shot Charlie Kirk.'",
+    sources: [{ label: "Facebook", url: "https://www.facebook.com/TrueReactionary/posts/exclusive-trans-people-dance-around-university-of-new-mexico-today-chanting-i-sh/776964288705297/" }]
+  },
+  {
+    cat: "Democrats Support the Bad People",
+    text: "Democrat Councilwoman Niki Rama blamed Toyota — rather than the car thieves — for the epidemic of Prius catalytic converter thefts in Los Angeles.",
+    sources: [{ label: "Yahoo News", url: "https://www.yahoo.com/news/l-councilwoman-blames-toyota-catalytic-133800854.html" }]
+  },
+
+  // ─── LACK OF COMPETENCE ───
+  {
+    cat: "Lack of Competence & Intelligence",
+    text: "AOC said the U.S. must avoid 'any such confrontation' on Taiwan — demonstrating a fundamental lack of foreign policy understanding.",
+    sources: [{ label: "YouTube", url: "https://www.youtube.com/watch?v=AOC_taiwan" }]
+  },
+  {
+    cat: "Lack of Competence & Intelligence",
+    text: "Gavin Newsom's 960 SAT score — and a clip where he implies Black people are stupid.",
+    sources: [{ label: "YouTube", url: "https://www.youtube.com/watch?v=glvhsIM5aug" }]
+  },
+  {
+    cat: "Lack of Competence & Intelligence",
+    text: "Supreme Court Justice Ketanji Brown Jackson was cited Marbury v. Madison in an argument — and appeared unfamiliar with the landmark case.",
+    sources: [{ label: "Cornell Law", url: "https://www.law.cornell.edu/supremecourt/text/24A884" }]
+  },
+  {
+    cat: "Lack of Competence & Intelligence",
+    text: "Anti-ICE protesters threw sex toys at their own car and stuck dildos on their own heads during a demonstration in Minneapolis.",
+    sources: [{ label: "Daily Mail", url: "https://www.dailymail.co.uk/news/article-15540193/Minneapolis-anti-ICE-protesters-sex-toys.html" }]
+  },
+  {
+    cat: "Lack of Competence & Intelligence",
+    text: "Kamala Harris used child actors in a NASA video to pretend they were speaking to her about space exploration.",
+    sources: [{ label: "Fox News", url: "https://www.foxnews.com/politics/kamala-harris-child-actors-nasa-video" }]
+  },
+  {
+    cat: "Lack of Competence & Intelligence",
+    text: "AOC falsely claimed that Deloitte is poisoning rivers.",
+    sources: [{ label: "CITE", url: "" }]
+  },
+  {
+    cat: "Lack of Competence & Intelligence",
+    text: "Ilhan Omar referred to World War II as 'World War Eleven.'",
+    sources: [{ label: "CITE", url: "" }]
+  },
+  {
+    cat: "Lack of Competence & Intelligence",
+    text: "Rep. Steve Cohen: 'They are arresting people simply for the offense of being in the country illegally.' (Apparently this was news to him.)",
+    sources: [{ label: "ICE / X", url: "https://x.com/ICEgov/status/2001450203530826136" }]
+  },
+  {
+    cat: "Lack of Competence & Intelligence",
+    text: "AOC claimed that Black people 'created democracy.'",
+    sources: [{ label: "CITE", url: "" }]
+  },
+
+  // ─── CONSEQUENCES OF DEMOCRATS IN POWER ───
+  {
+    cat: "Consequences of Democrats in Power",
+    text: "Schools in California were caught hiding students' gender transitions and name/pronoun changes from parents, violating federal law.",
+    sources: [{ label: "Dept. of Education", url: "https://www.ed.gov/about/news/press-release/us-department-of-education-finds-california-department-of-education-violated-federal-law-hiding-students-gender-transitions-parents" }]
+  },
+  {
+    cat: "Consequences of Democrats in Power",
+    text: "President Trump was banned from Twitter by the company's left-leaning management.",
+    sources: [{ label: "Toronto Sun", url: "https://torontosun.com/opinion/columnists/goldstein-twitters-self-righteous-permanent-banning-of-trump-hypocritical" }]
+  },
+  {
+    cat: "Consequences of Democrats in Power",
+    text: "A coalition of preservationists sued to stop Trump's Kennedy Center renovation.",
+    sources: [{ label: "Reuters", url: "https://www.reuters.com/legal/government/preservation-groups-sue-trump-block-kennedy-center-overhaul-2026-03-23/" }]
+  },
+  {
+    cat: "Consequences of Democrats in Power",
+    text: "A Christian baker was forced — under threat of legal action — to bake a cake for a same-sex couple against his religious beliefs.",
+    sources: [{ label: "Wikipedia / Masterpiece Cakeshop", url: "https://en.wikipedia.org/wiki/Masterpiece_Cakeshop_v._Colorado_Civil_Rights_Commission" }]
+  },
+  {
+    cat: "Consequences of Democrats in Power",
+    text: "A Christian wedding photographer was forced to photograph a same-sex wedding against her religious beliefs and lost her legal case.",
+    sources: [{ label: "NBC News", url: "https://www.nbcnews.com/nbc-out/out-news/christian-wedding-photographer-refused-service-gay-couples-loses-case-rcna9060" }]
+  },
+  {
+    cat: "Consequences of Democrats in Power",
+    text: "Democrat judges have repeatedly abused their power to obstruct conservative governance.",
+    sources: [{ label: "CITE", url: "" }]
+  },
+  {
+    cat: "Consequences of Democrats in Power",
+    text: "California teachers led 2nd graders in a march and chants against ICE.",
+    sources: [{ label: "Facebook / David Harris Jr.", url: "https://www.facebook.com/DavidJHarrisJr/posts/california-teachers-leading-2nd-graders-to-chant-and-march-against-ice-in-a-disg/1482587476773122/" }]
+  },
+  {
+    cat: "Consequences of Democrats in Power",
+    text: "NY Democrats passed the Adult Survivors Act — an unconstitutional retroactive due-process violation targeted at political opponents — to create a one-year window reviving decades-old civil claims with no exact date required. This enabled the E. Jean Carroll case against Trump.",
+    sources: [{ label: "Politico", url: "https://www.politico.com/news/2022/12/21/trump-jean-caroll-rape-lawsuit-00074983" }]
+  },
+  {
+    cat: "Consequences of Democrats in Power",
+    text: "Democrat Georgia House candidate Suzanna Karatassos said Trump supporters should not be allowed to post anything online for four years.",
+    sources: [{ label: "Facebook / Daily Caller", url: "https://www.facebook.com/DailyCaller/posts/a-democratic-candidate-for-a-seat-in-the-georgia-house-of-representatives-said-s/1323052569679315/" }]
+  },
+  {
+    cat: "Consequences of Democrats in Power",
+    text: "Registered Democrat judge released a sex offender on bond. One month later, the sex offender beat, bound, and suffocated a 5-year-old girl. She died.",
+    sources: [{ label: "Fox News", url: "https://www.foxnews.com/politics/desantis-calls-impeachment-judge-who-released-sex-offender-bond" }]
+  },
+  {
+    cat: "Consequences of Democrats in Power",
+    text: "Lawrence Reed knocked a social worker unconscious but was released by Judge Theresa Molina-Gonzales. Three months later, he poured gasoline on Bethany McGee on a CTA train and lit her on fire.",
+    sources: [{ label: "ABC7 Chicago", url: "https://abc7chicago.com/post/lawrence-reed-cta-blue-line-fire-attack-suspect-due-court-indictment-includes-arson-chicago-city-hall/18437103/" }]
+  },
+  {
+    cat: "Consequences of Democrats in Power",
+    text: "Roughly 9% of all U.S. births are to unauthorized or temporary legal immigrant mothers — i.e., foreign anchor babies.",
+    sources: [{ label: "Pew Research", url: "https://www.pewresearch.org/short-reads/2026/03/31/about-9-of-us-births-in-2023-were-to-unauthorized-or-temporary-legal-immigrant-mothers/" }]
+  },
+  {
+    cat: "Consequences of Democrats in Power",
+    text: "Only 9 counties accounted for two-thirds of all violent confrontations with ICE agents.",
+    sources: [{ label: "Townhall", url: "https://townhall.com/tipsheet/mattvespa/2026/01/28/two-thirds-of-all-violent-confrontations-against-ice-agents-come-from-just-nine-counties-n2670208" }]
+  },
+  {
+    cat: "Consequences of Democrats in Power",
+    text: "Foreign-born employment is growing 42 times faster than native-born employment since 2019.",
+    sources: [{ label: "Instagram Source", url: "https://www.instagram.com/p/DWuf6LqEUEe/" }]
+  },
+  {
+    cat: "Consequences of Democrats in Power",
+    text: "Health Canada sealed vaccine injury records for 15 years.",
+    sources: [{ label: "Western Standard", url: "https://www.westernstandard.news/news/health-canada-seals-vaccine-injury-records-for-15-years/70851" }]
+  },
+  {
+    cat: "Consequences of Democrats in Power",
+    text: "Sanctuary Cities across America shield criminal illegal aliens from deportation, putting Americans at risk.",
+    sources: [{ label: "CITE", url: "" }]
+  },
+  {
+    cat: "Consequences of Democrats in Power",
+    text: "California Democrats passed a bill to seize Bitcoin after just 3 years of 'inactivity,' treating crypto like unclaimed property.",
+    sources: [{ label: "Thomson Reuters", url: "https://tax.thomsonreuters.com/news/california-subjects-digital-financial-assets-to-unclaimed-property-law/" }]
+  },
+  {
+    cat: "Consequences of Democrats in Power",
+    text: "Gavin Newsom's wife said they must use the powers of government to stop boys from 'becoming right-wing.'",
+    sources: [{ label: "YouTube", url: "https://www.youtube.com/watch?v=y97SpRiujys" }]
+  },
+  {
+    cat: "Consequences of Democrats in Power",
+    text: "Judge Rosie Speedlin-Gonzales was arrested for handcuffing an attorney. She claimed she was targeted because of her pride flags.",
+    sources: [{ label: "News4 San Antonio", url: "https://news4sanantonio.com/news/local/today-suspended-bexar-county-judge-set-for-first-court-appearance-since-indictment-san-antonio-texas-courtroom-charges-official-oppression-unlawful-restraint" }]
+  },
+  {
+    cat: "Consequences of Democrats in Power",
+    text: "Mohamed Mohamed, 39, was charged with four counts of rape for sexually assaulting an impaired/unconscious woman multiple times in front of a Nashville church. She was transported to a hospital and died.",
+    sources: [{ label: "Nashville Police", url: "https://www.nashville.gov/departments/police/news/man-charged-four-counts-rape-sexually-assaulting-impaired-unconscious-woman" }]
+  },
+  {
+    cat: "Consequences of Democrats in Power",
+    text: "A teacher created a certificate for a 6-year-old student saying 'Most Likely to Become a Dictator' and presented it in front of the entire class — after the child had expressed conservative views.",
+    sources: [{ label: "Gainesville.com", url: "https://www.gainesville.com/story/news/education/2026/03/26/gainesville-florida-teacher-to-appear-in-court-over-dictator-award/89334389007/" }]
+  },
+  {
+    cat: "Consequences of Democrats in Power",
+    text: "Disney executive openly admitted to a 'not secret at all gay agenda' and to 'basically adding queerness wherever I could.'",
+    sources: [{ label: "CITE", url: "" }]
+  },
+
+  // ─── THE MAINSTREAM MEDIA ───
+  {
+    cat: "The Mainstream Media",
+    text: "Democrats and their allies suppressed the authentic Hunter Biden laptop story before the 2020 election by organizing a letter from 51 former intelligence officials falsely labeling it a 'Russian information operation' — despite the FBI verifying the laptop since 2019 with no Russian evidence. Twitter blocked links, Facebook throttled distribution, and major media dismissed it.",
+    sources: [{ label: "Wikipedia", url: "https://en.wikipedia.org/wiki/Hunter_Biden_laptop_controversy" }]
+  },
+  {
+    cat: "The Mainstream Media",
+    text: "CNN reframed a story about two Pennsylvania teenagers who threw homemade bombs during an anti-Muslim protest outside a Democrat politician's home — referring to the bombing as a 'protest' and later took down the post.",
+    sources: [{ label: "Facebook / Salem News Channel", url: "https://www.facebook.com/WatchSalemNewsChannel/videos/cnn-has-taken-down-their-post-that-reframed-the-attempted-nyc-terror-attack-as-i/17376713338742115/" }]
+  },
+  {
+    cat: "The Mainstream Media",
+    text: "Media outlets described BLM riots burning cities as a 'mostly peaceful protest.'",
+    sources: [{ label: "YouTube", url: "https://www.youtube.com/watch?v=3B79fn6Fmj0" }]
+  },
+  {
+    cat: "The Mainstream Media",
+    text: "CNN was forced to retract a Russia-Trump story in 2017 and accept the resignations of three journalists involved.",
+    sources: [{ label: "Politico", url: "https://www.politico.com/blogs/on-media/2017/06/26/cnn-resign-russia-scaramucci-239975" }]
+  },
+  {
+    cat: "The Mainstream Media",
+    text: "CNN host Jake Tapper lied about the race of the January 6 pipe bomber, calling him white.",
+    sources: [{ label: "White House Media Bias Reporter", url: "https://www.whitehouse.gov/media-bias-reporter/jake-tapper/" }]
+  },
+  {
+    cat: "The Mainstream Media",
+    text: "Democratic media personality Harry Sisson attacked Trump's health on January 1, 2026 — after spending years saying Biden was 'perfectly fit to serve' and calling anyone who disagreed a liar.",
+    sources: [
+      { label: "X (Jan 2026)", url: "https://x.com/harryjsisson/status/2006870494902198338" },
+      { label: "X (Jul 2024)", url: "https://x.com/harryjsisson/status/1811557978417385531" },
+      { label: "X (Feb 2024)", url: "https://x.com/harryjsisson/status/1762956593291825402" }
+    ]
+  },
+  {
+    cat: "The Mainstream Media",
+    text: "Media outlets used AI-altered images of Alex Pretti to make him appear more physically attractive.",
+    sources: [{ label: "NY Post", url: "https://nypost.com/2026/01/28/us-news/photo-of-alex-pretti-altered-by-ai-to-look-more-pretty-was-originally-staff-portrait-at-minneapolis-va-hospital/" }]
+  },
+  {
+    cat: "The Mainstream Media",
+    text: "The Washington Post declared that the most relevant figure in Super Bowl LX is Colin Kaepernick.",
+    sources: [{ label: "Washington Post", url: "https://www.washingtonpost.com/sports/2026/02/07/colin-kaepernick-protest-super-bowl/" }]
+  },
+  {
+    cat: "The Mainstream Media",
+    text: "The Washington Post ran the headline 'Abu Bakr al-Baghdadi, austere religious scholar at helm of Islamic State, dies at 48' — describing the ISIS founder's death.",
+    sources: [{ label: "USA Today", url: "https://www.usatoday.com/story/news/politics/2019/10/28/abu-bakr-al-baghdadi-washington-post-austere-headline/2483340001/" }]
+  },
+  {
+    cat: "The Mainstream Media",
+    text: "The Washington Post called the COVID lab-leak theory a 'fringe theory' being repeated by Tom Cotton — a theory that has since been validated by major intelligence agencies.",
+    sources: [{ label: "Washington Post", url: "https://www.washingtonpost.com/politics/2020/02/16/tom-cotton-coronavirus-conspiracy/" }]
+  },
+  {
+    cat: "The Mainstream Media",
+    text: "PBS headlined: 'Oklahoma's Sen. Jim Inhofe, Republican known for denying human-caused climate change, dies at 89' — politicizing his obituary.",
+    sources: [{ label: "PBS NewsHour", url: "https://www.pbs.org/newshour/politics/oklahomas-sen-jim-inhofe-republican-known-for-denying-human-caused-climate-change-dies-at-89" }]
+  },
+  {
+    cat: "The Mainstream Media",
+    text: "The Washington Post ran 'The case for Trump-Russia collusion: We're getting very, very close' — a story that proved entirely false.",
+    sources: [{ label: "Washington Post", url: "https://www.washingtonpost.com/news/global-opinions/wp/2017/09/08/the-case-for-trump-russia-collusion-were-getting-very-very-close/" }]
+  },
+  {
+    cat: "The Mainstream Media",
+    text: "CNN ran Iranian propaganda: 'Iran claims victory, says it forced US to accept 10-point plan.'",
+    sources: [{ label: "CNN", url: "https://edition.cnn.com/2026/04/07/world/live-news/iran-war-trump-us-israel" }]
+  },
+  {
+    cat: "The Mainstream Media",
+    text: "CNN's Erin Burnett said an NYC shooter was 'possibly white' — without evidence.",
+    sources: [{ label: "YouTube", url: "https://www.youtube.com/watch?v=pqJdFP-etb0" }]
+  },
+  {
+    cat: "The Mainstream Media",
+    text: "The Washington Post reported that Defense Secretary Hegseth ordered 'leave no survivors' during a SEAL Team 6 operation — framing a lawful military action as a war crime.",
+    sources: [{ label: "Washington Post", url: "https://www.washingtonpost.com/national-security/2025/11/28/hegseth-kill-them-all-survivors-boat-strike/" }]
+  },
+  {
+    cat: "The Mainstream Media",
+    text: "Media outlets expressed outrage over the concept of 'no man left behind' in military operations.",
+    sources: [{ label: "Fox News", url: "https://www.foxnews.com/video/6392769243112" }]
+  },
+  {
+    cat: "The Mainstream Media",
+    text: "Media outlets falsely reported that a Trump undersecretary threatened the Vatican.",
+    sources: [{ label: "The Independent", url: "https://www.the-independent.com/news/world/americas/us-politics/vatican-meeting-pope-leo-trump-b2955376.html" }]
+  },
+  {
+    cat: "The Mainstream Media",
+    text: "A magazine published a story framing Adrian Jelks — who shot a 9-year-old girl in the face and murdered a 19-year-old — as a teen 'defending himself at Walmart' sentenced unjustly.",
+    sources: [{ label: "Royal Tee Magazine", url: "https://royalteemagazine.com/georgia-teen-sentenced-to-70-years-in-prison-for-defending-himself-at-walmart/" }]
+  },
+
+  // ─── HYPOCRISY & LIES ───
+  {
+    cat: "Hypocrisy & Lies",
+    text: "Democrats demanded a border wall when Republicans built one — then opposed it entirely when Trump did it.",
+    sources: [{ label: "CITE", url: "" }]
+  },
+  {
+    cat: "Hypocrisy & Lies",
+    text: "Gavin Newsom used the term 'LatinX' — a term almost universally rejected by Hispanic Americans — to appear progressive.",
+    sources: [{ label: "CITE", url: "" }]
+  },
+  {
+    cat: "Hypocrisy & Lies",
+    text: "Democrats demand election results be accepted without question — while 2000 Democrats claimed Florida was stolen, 2004 Democrats claimed Ohio voting machines were rigged, 2016 Democrats claimed Russia brainwashed millions of Americans, and 2024 Democrats claimed Elon Musk used Starlink to manipulate the outcome.",
+    sources: [{ label: "CITE", url: "" }]
+  },
+  {
+    cat: "Hypocrisy & Lies",
+    text: "Chuck Schumer said in 1996 that voter ID is 'common sense.' In 2026, he called voter ID 'Jim Crow 2.0.'",
+    sources: [{ label: "CITE", url: "" }]
+  },
+  {
+    cat: "Hypocrisy & Lies",
+    text: "NYC Mayoral candidate Mamdani — who publicly opposes ID requirements — required two forms of ID to participate in a snow-shoveling event.",
+    sources: [{ label: "CITE", url: "" }]
+  },
+  {
+    cat: "Hypocrisy & Lies",
+    text: "Rep. Frederica Wilson said in 2018 it was 'an outrage' Trump called Haiti a 'sh*thole.' In 2026 she said sending Haitians back is 'a death sentence, full of warfare, rape, and violence' — confirming the original characterization.",
+    sources: [{ label: "CITE", url: "" }]
+  },
+  {
+    cat: "Hypocrisy & Lies",
+    text: "Eric Swalwell demanded full transparency for Brett Kavanaugh (who was completely exonerated) while facing no accountability himself for allegations that he sexually assaulted interns.",
+    sources: [{ label: "CITE", url: "" }]
+  },
+  {
+    cat: "Hypocrisy & Lies",
+    text: "Abigail Spanberger and Barack Obama lied about their redistricting scheme in Virginia.",
+    sources: [
+      { label: "Real Clear Politics", url: "https://www.realclearpolitics.com/articles/2026/02/26/spanberger_and_dems_lie_about_gerrymandering_scheme_153882.html" },
+      { label: "CNN", url: "https://www.cnn.com/2026/04/02/politics/virginia-redistricting-fight-barack-obama" }
+    ]
+  },
+  {
+    cat: "Hypocrisy & Lies",
+    text: "Harry Sisson publicly lied about not taking money from PACs.",
+    sources: [{ label: "X", url: "https://x.com/harryjsisson/status/1803107530660519948" }]
+  },
+  {
+    cat: "Hypocrisy & Lies",
+    text: "Connecticut Democrats required ID to recycle cans but blocked every GOP effort to verify citizenship at the polls.",
+    sources: [{ label: "Fox News", url: "https://www.foxnews.com/politics/connecticut-democrats-demand-ids-recycle-cans-reject-efforts-verify-citizenship-polls" }]
+  },
+  {
+    cat: "Hypocrisy & Lies",
+    text: "Rep. Pramila Jayapal asked AG Bondi to apologize to Epstein survivors in person — while her party covered up Epstein connections for years.",
+    sources: [{ label: "PBS NewsHour", url: "https://www.pbs.org/newshour/politics/watch-rep-jayapal-asks-bondi-to-apologize-in-person-to-epstein-survivors" }]
+  },
+  {
+    cat: "Hypocrisy & Lies",
+    text: "Michelle Obama served troops ribeyes and surf & turf — while Democrats publicly attacked Trump for serving fast food to college athletes.",
+    sources: [{ label: "Facebook / David Harris Jr.", url: "https://www.facebook.com/DavidJHarrisJr/posts/heres-michelle-obama-serving-ribeyes-to-troops-as-part-of-a-surf-and-turf-meal-t/1518304156534787/" }]
+  },
+  {
+    cat: "Hypocrisy & Lies",
+    text: "Gavin Newsom called himself poor growing up — but as a child was literally featured in a magazine article called 'Children of the Rich.'",
+    sources: [{ label: "CITE", url: "" }]
+  },
+  {
+    cat: "Hypocrisy & Lies",
+    text: "Gavin Newsom's team read aloud from banned books to signal virtue (March 30, 2022) — despite him being unable to read the books fluently.",
+    sources: [{ label: "CITE", url: "" }]
+  },
+
+  // ─── RACISM ───
+  {
+    cat: "Racism",
+    text: "The Obamas' Netflix show 'If the World Falls Apart' includes the quote: 'I'm asking you to remember that if the world falls apart, trust should not be doled out easily to anyone, especially white people.'",
+    sources: [{ label: "CITE", url: "" }]
+  },
+  {
+    cat: "Racism",
+    text: "The Southern Poverty Law Center (SPLC) — one of the most prominent Democrat political organizations, known for putting conservative moms on terrorist watch lists — was caught funding racist extremist groups including the Ku Klux Klan, American Nazi Party, Aryan Nation, United Klans of America, Unite the Right, National Alliance, National Socialist Movement, Sadistic Souls Motorcycle Club, and American Front.",
+    sources: [{ label: "CITE", url: "" }]
+  },
+
+  // ─── PEOPLE ───
+  {
+    cat: "People",
+    text: "Ilhan Omar: Her father's army committed genocide. America gave her asylum. She called 9/11 'some people did something,' funneled $2.78M to her boyfriend, and enabled $250M in fraud in her own district. She filed $30M in assets under oath, then changed it to $95K. The VP says she committed immigration fraud. She tried to funnel $1.4M to a clinic that doesn't exist — the address is a restaurant. She wants to abolish the agencies investigating her. She screams genocide but her father served one. She went from broke with student loan debt to claiming $30M. She ghosted a fraud hearing.",
+    sources: [{ label: "CITE", url: "" }]
+  },
+  {
+    cat: "People",
+    text: "Gavin Newsom was caught spending $1,561,865 from his own PAC money to buy copies of his own book, artificially boosting its sales figures.",
+    sources: [{ label: "New York Times", url: "https://www.nytimes.com/2026/04/16/us/politics/newsom-book-donors.html" }]
+  },
+
+  // ─── OTHER ───
+  {
+    cat: "Other",
+    text: "NBC anchor Matt Lauer had a secret button installed in his office to lock the door so he could sexually assault employees without interruption.",
+    sources: [{ label: "The Atlantic", url: "https://www.theatlantic.com/entertainment/archive/2017/11/about-that-secret-button-in-matt-lauers-office/547106/" }]
+  },
+  {
+    cat: "Other",
+    text: "Biden's DOJ sued nuns (the Little Sisters of the Poor) for refusing to support abortion in their healthcare plans.",
+    sources: [{ label: "CITE", url: "" }]
+  },
+  {
+    cat: "Other",
+    text: "Days before Rep. Ayanna Pressley was sworn into Congress, her husband quietly quit his $92,000/year job to start a 'consulting firm.'",
+    sources: [{ label: "CITE", url: "" }]
+  },
+  {
+    cat: "Other",
+    text: "Treasury Secretary Janet Yellen proposed a 25% capital gains tax.",
+    sources: [{ label: "IFC Review", url: "https://www.ifcreview.com/news/2025/february/us-treasury-secretary-janet-yellen-makes-decision-on-call-for-global-tax-on-billionaires/" }]
+  }
+];
+
+// ========== STATE ==========
+let currentCat = "all";
+let currentSearch = "";
+
+// ========== CATEGORY MAPPING ========== 
+const catOrder = [
+  "Criminal Activity & Fraud",
+  "Anti-American & Anti-Republican",
+  "Democrats Support the Bad People",
+  "Lack of Competence & Intelligence",
+  "Consequences of Democrats in Power",
+  "The Mainstream Media",
+  "Hypocrisy & Lies",
+  "Racism",
+  "People",
+  "Other"
+];
+
+const catIcons = {
+  "Criminal Activity & Fraud": "⚖️",
+  "Anti-American & Anti-Republican": "🇺🇸",
+  "Democrats Support the Bad People": "🚨",
+  "Lack of Competence & Intelligence": "🤦",
+  "Consequences of Democrats in Power": "📉",
+  "The Mainstream Media": "📺",
+  "Hypocrisy & Lies": "🎭",
+  "Racism": "✊",
+  "People": "👤",
+  "Other": "📌"
+};
+
+const catCountIds = {
+  "all": "cnt-all",
+  "Criminal Activity & Fraud": "cnt-crime",
+  "Anti-American & Anti-Republican": "cnt-antiam",
+  "Democrats Support the Bad People": "cnt-bad",
+  "Lack of Competence & Intelligence": "cnt-incomp",
+  "Consequences of Democrats in Power": "cnt-conseq",
+  "The Mainstream Media": "cnt-media",
+  "Hypocrisy & Lies": "cnt-hypo",
+  "Racism": "cnt-racism",
+  "People": "cnt-people",
+  "Other": "cnt-other"
+};
+
+// ========== RENDER ==========
+function filterFacts() {
+  currentSearch = document.getElementById("search").value;
+  renderFacts();
+}
+
+function renderFacts() {
+  const main = document.getElementById("mainContent");
+  const noResults = document.getElementById("noResults");
+  const q = currentSearch.toLowerCase();
+
+  const categories = {};
+  let totalVisible = 0;
+
+  catOrder.forEach(cat => {
+    let facts = FACTS.filter(f => f.cat === cat);
+    if (currentCat !== "all") facts = facts.filter(f => f.cat === currentCat);
+    if (q) facts = facts.filter(f =>
+      f.text.toLowerCase().includes(q) ||
+      f.sources.some(s => s.label.toLowerCase().includes(q))
+    );
+    if (facts.length) categories[cat] = facts;
+    totalVisible += facts.length;
+  });
+
+  // Update counts
+  document.getElementById("factCount").textContent = `${totalVisible} fact${totalVisible !== 1 ? "s" : ""}`;
+  document.getElementById("statShowing").textContent = totalVisible;
+
+  // Remove old sections
+  main.querySelectorAll(".category-section").forEach(s => s.remove());
+
+  if (totalVisible === 0) {
+    noResults.classList.add("visible");
+    return;
+  }
+  noResults.classList.remove("visible");
+
+  catOrder.forEach(cat => {
+    if (!categories[cat]) return;
+    const facts = categories[cat];
+
+    const section = document.createElement("div");
+    section.className = "category-section";
+    section.dataset.cat = cat;
+
+    section.innerHTML = `
+      <div class="category-header">
+        <div class="category-icon">${catIcons[cat] || "📌"}</div>
+        <div class="category-title">${cat}</div>
+        <div class="category-count">${facts.length} fact${facts.length !== 1 ? "s" : ""}</div>
+      </div>
+      <div class="facts-grid" id="grid-${cat.replace(/\W/g,'_')}"></div>
+    `;
+    main.appendChild(section);
+
+    const grid = section.querySelector(".facts-grid");
+    facts.forEach(f => {
+      const card = document.createElement("div");
+      card.className = "fact-card";
+      const sourcesHtml = f.sources.map(s => {
+        if (!s.url) return `<span class="source-cite">⚑ ${s.label}</span>`;
+        return `<a class="source-link" href="${s.url}" target="_blank" rel="noopener">↗ ${s.label}</a>`;
+      }).join('');
+      card.innerHTML = `
+        <div class="fact-text">${f.text}</div>
+        <div class="sources">
+          <span class="source-label">Source${f.sources.length > 1 ? "s" : ""}:</span>
+          ${sourcesHtml}
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+  });
+}
+
+function setCategory(cat, btn) {
+  currentCat = cat;
+  document.querySelectorAll(".sidebar-nav button").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  renderFacts();
+  // scroll to top of content
+  document.querySelector(".page-layout").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+// ========== MODAL ==========
+function openModal() {
+  document.getElementById("modalOverlay").classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+
+function closeModal() {
+  document.getElementById("modalOverlay").classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+function closeModalOutside(e) {
+  if (e.target === document.getElementById("modalOverlay")) closeModal();
+}
+
+function addSourceInput() {
+  const container = document.getElementById("sourceInputs");
+  const row = document.createElement("div");
+  row.className = "source-input-row";
+  row.innerHTML = `<input class="form-input" type="url" placeholder="https://…" /><button class="remove-source" onclick="this.parentElement.remove()">×</button>`;
+  container.appendChild(row);
+}
+
+function submitSuggestion() {
+  const fact = document.getElementById("suggestFact").value.trim();
+  if (!fact) { showToast("Please enter a fact."); return; }
+  closeModal();
+  showToast("✓ Suggestion received — thank you!");
+  document.getElementById("suggestFact").value = "";
+  document.getElementById("suggestCategory").value = "";
+  document.getElementById("sourceInputs").innerHTML =
+    `<div class="source-input-row"><input class="form-input" type="url" placeholder="https://…" /></div>`;
+}
+
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 3000);
+}
+
+// ========== SIDEBAR COUNTS ==========
+function updateSidebarCounts() {
+  // total
+  document.getElementById("cnt-all").textContent = FACTS.length;
+  document.getElementById("statTotal").textContent = FACTS.length;
+  const sourced = FACTS.filter(f => f.sources.some(s => s.url)).length;
+  document.getElementById("statSourced").textContent = sourced;
+
+  catOrder.forEach(cat => {
+    const count = FACTS.filter(f => f.cat === cat).length;
+    const id = catCountIds[cat];
+    if (id) document.getElementById(id).textContent = count;
+  });
+}
+
+// ========== STARS ==========
+function drawStars() {
+  const canvas = document.getElementById("starsCanvas");
+  const ctx = canvas.getContext("2d");
+  canvas.width = 300; canvas.height = 180;
+  const positions = [
+    [15,12],[45,12],[75,12],[105,12],[135,12],[165,12],[195,12],[225,12],[255,12],[285,12],
+    [30,26],[60,26],[90,26],[120,26],[150,26],[180,26],[210,26],[240,26],[270,26],
+    [15,40],[45,40],[75,40],[105,40],[135,40],[165,40],[195,40],[225,40],[255,40],[285,40],
+    [30,54],[60,54],[90,54],[120,54],[150,54],[180,54],[210,54],[240,54],[270,54],
+    [15,68],[45,68],[75,68],[105,68],[135,68],[165,68],[195,68],[225,68],[255,68],[285,68],
+    [30,82],[60,82],[90,82],[120,82],[150,82],[180,82],[210,82],[240,82],[270,82],
+  ];
+  ctx.fillStyle = "rgba(255,255,255,0.82)";
+  positions.forEach(([x,y]) => {
+    ctx.beginPath();
+    drawStar(ctx, x, y, 5, 4.5, 2);
+    ctx.fill();
+  });
+}
+
+function drawStar(ctx, cx, cy, spikes, outerR, innerR) {
+  let rot = (Math.PI / 2) * 3;
+  const step = Math.PI / spikes;
+  ctx.beginPath();
+  ctx.moveTo(cx, cy - outerR);
+  for (let i = 0; i < spikes; i++) {
+    ctx.lineTo(cx + Math.cos(rot) * outerR, cy + Math.sin(rot) * outerR);
+    rot += step;
+    ctx.lineTo(cx + Math.cos(rot) * innerR, cy + Math.sin(rot) * innerR);
+    rot += step;
+  }
+  ctx.lineTo(cx, cy - outerR);
+  ctx.closePath();
+}
+
+// ========== INIT ==========
+document.addEventListener("DOMContentLoaded", () => {
+  drawStars();
+  updateSidebarCounts();
+  renderFacts();
+});
+</script>
+</body>
+</html>
