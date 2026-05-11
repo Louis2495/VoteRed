@@ -40,7 +40,9 @@
   /* ========== HERO ========== */
   .hero {
     position: relative;
-    background: var(--red);
+    background:
+      linear-gradient(rgba(10,20,50,0.55), rgba(10,20,50,0.55)),
+      url('https://upload.wikimedia.org/wikipedia/en/a/a4/Flag_of_the_United_States.svg') center center / cover no-repeat;
     min-height: 280px;
     display: flex;
     flex-direction: column;
@@ -50,35 +52,10 @@
     padding: 60px 20px 50px;
   }
 
-  /* Subtle flag stripes */
-  .hero::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: repeating-linear-gradient(
-      180deg,
-      rgba(255,255,255,0.07) 0px, rgba(255,255,255,0.07) 36px,
-      transparent 36px, transparent 72px
-    );
-  }
+  .hero::before { content: none; }
+  .hero::after  { content: none; }
 
-  /* Dark navy canton area */
-  .hero::after {
-    content: '';
-    position: absolute;
-    top: 0; left: 0;
-    width: 300px; height: 180px;
-    background: var(--navy-dark);
-    opacity: 0.5;
-  }
-
-  .stars-canvas {
-    position: absolute;
-    top: 0; left: 0;
-    width: 300px; height: 180px;
-    pointer-events: none;
-    z-index: 1;
-  }
+  .stars-canvas { display: none; }
 
   .hero-content {
     position: relative;
@@ -155,8 +132,7 @@
   }
 
   .search-wrap {
-    flex: 1;
-    min-width: 200px;
+    flex: 0 0 260px;
     position: relative;
   }
 
@@ -212,8 +188,8 @@
     font-size: 12px;
     color: rgba(255,255,255,0.4);
     letter-spacing: 1px;
-    margin-left: auto;
     white-space: nowrap;
+    flex: 1;
   }
 
   .suggest-btn {
@@ -1897,22 +1873,36 @@ function updateSidebarCounts() {
 // ========== STARS ==========
 function drawStars() {
   const canvas = document.getElementById("starsCanvas");
+  const w = canvas.offsetWidth || 340;
+  const h = canvas.offsetHeight || 180;
+  canvas.width = w;
+  canvas.height = h;
   const ctx = canvas.getContext("2d");
-  canvas.width = 300; canvas.height = 180;
-  const positions = [
-    [15,12],[45,12],[75,12],[105,12],[135,12],[165,12],[195,12],[225,12],[255,12],[285,12],
-    [30,26],[60,26],[90,26],[120,26],[150,26],[180,26],[210,26],[240,26],[270,26],
-    [15,40],[45,40],[75,40],[105,40],[135,40],[165,40],[195,40],[225,40],[255,40],[285,40],
-    [30,54],[60,54],[90,54],[120,54],[150,54],[180,54],[210,54],[240,54],[270,54],
-    [15,68],[45,68],[75,68],[105,68],[135,68],[165,68],[195,68],[225,68],[255,68],[285,68],
-    [30,82],[60,82],[90,82],[120,82],[150,82],[180,82],[210,82],[240,82],[270,82],
-  ];
-  ctx.fillStyle = "rgba(255,255,255,0.82)";
-  positions.forEach(([x,y]) => {
-    ctx.beginPath();
-    drawStar(ctx, x, y, 5, 4.5, 2);
-    ctx.fill();
-  });
+
+  // 50 stars: alternating rows of 6 and 5 (9 rows total: 5 wide + 4 narrow)
+  const padX = w * 0.07;
+  const padY = h * 0.08;
+  const totalRows = 9;
+  const rowH = (h - padY * 2) / (totalRows - 1);
+  const colW6 = (w - padX * 2) / 5;
+  const colW5 = (w - padX * 2) / 4;
+  const starR = Math.min(w, h) * 0.03;
+
+  ctx.fillStyle = "rgba(255,255,255,0.92)";
+
+  for (let row = 0; row < totalRows; row++) {
+    const isWide = row % 2 === 0;
+    const cols = isWide ? 6 : 5;
+    const colW = isWide ? colW6 : colW5;
+    const offsetX = isWide ? padX : padX + colW6 / 2;
+    const y = padY + row * rowH;
+    for (let col = 0; col < cols; col++) {
+      const x = offsetX + col * colW;
+      ctx.beginPath();
+      drawStar(ctx, x, y, 5, starR, starR * 0.42);
+      ctx.fill();
+    }
+  }
 }
 
 function drawStar(ctx, cx, cy, spikes, outerR, innerR) {
@@ -1932,9 +1922,11 @@ function drawStar(ctx, cx, cy, spikes, outerR, innerR) {
 
 // ========== INIT ==========
 document.addEventListener("DOMContentLoaded", () => {
-  drawStars();
   updateSidebarCounts();
   renderFacts();
+  // slight defer so canvas has rendered dimensions
+  requestAnimationFrame(() => { requestAnimationFrame(drawStars); });
+  window.addEventListener("resize", drawStars);
 });
 </script>
 </body>
